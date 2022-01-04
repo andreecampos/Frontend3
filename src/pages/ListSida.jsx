@@ -1,10 +1,21 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { NameContext } from "../App";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import PostNyKund from "./PostNyKund";
 
 
-export default function ListSida() {
+export default function ListSida(props) {
+  const [myData, setMyData] = useState(null)
+  const  [name,  setName] = useState("")
+    const [organisationNr, setOrganisationNr] = useState(0)
+    const [vatNr, setVatNr]= useState(0)
+    const [reference, setReference] = useState("")
+    const [paymentTerm, setPaymentTerm] = useState(0)
+    const [website, setWebsite] = useState("")
+    const [email, setEmail]=useState("")
+    const [phoneNumber,  setPhoneNumber]=useState("")
+
+
   const { postList, setPostList } = useContext(NameContext);
 
   useEffect(() => {
@@ -16,7 +27,7 @@ export default function ListSida() {
     const token = localStorage.getItem("final-project");
     const headers = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      'Authorization' : `Bearer ${token}`
     };
     fetch(url, {
       method: "GET",
@@ -26,7 +37,7 @@ export default function ListSida() {
       //.then(data => console.log(data))
       .then((data) => setPostList(data.results));
   }
-
+//DELETE 
   function handleOnDelete(id) {
     console.log(id);
     const url = `https://frebi.willandskill.eu/api/v1/customers/${id}/`;
@@ -40,6 +51,35 @@ export default function ListSida() {
       method: "DELETE",
     }).then((res) => fetchData());
   }
+  //Patch funktion
+  function handleOnSubmit(id){
+  //e.preventDefault()
+    const url = `https://frebi.willandskill.eu/api/v1/customers/${id}/`;
+    const token = localStorage.getItem("final-project");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+    const  payload  = {
+      name, organisationNr,  vatNr, reference, paymentTerm, 
+      website, email, phoneNumber
+    };
+    
+    fetch(url, {
+        method: "PATCH",
+        headers: headers,
+        body: JSON.stringify(payload)
+    })
+    //console.log(payload)
+    .then((res)=> res.json())
+    .then((data)=>{
+     setPostList(data.postList)
+     fetchData()
+    })
+    //.then((res) => fetchData())
+    ;
+}
+  
 
   return (
     
@@ -61,7 +101,7 @@ export default function ListSida() {
                     <button onClick={(e) => handleOnDelete(item.id)}>
                       DELETE
                     </button>
-                    <button>Uppdatera info</button>
+                    <button onClick={(e) => handleOnSubmit(item.id)}>Uppdatera info</button>
                   </div>
                 );
               })}

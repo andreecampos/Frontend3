@@ -23,18 +23,22 @@ function App() {
   function fetchData() {
     const url = "https://frebi.willandskill.eu/api/v1/customers/";
     const token = localStorage.getItem("final-project");
+    
+    if (!token) {return}
+
     const headers = {
       'Content-Type' : 'application/json',
       'Authorization' : `Bearer ${token}`,
     };
-    fetch(url, {
+    fetch (url, {
       method: "GET",
       headers: headers,
     })
-      .then((res) => res.json())
-      //.then(data => console.log(data))
-      .then((data) => setPostList(data.results));
+    .then((res) => res.json())
+    //.then(data => console.log(data))
+    .then((data) => setPostList(data.results));
   }
+
 
   return (
     <NameContext.Provider value={{ postList, setPostList }}>
